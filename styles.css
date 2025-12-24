@@ -1,0 +1,60 @@
+label{
+    color: white;
+}
+.selected{
+    color: white;
+    background-color: rgb(0, 136, 255);
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.584) ;
+    border: solid 1px ;
+}
+
+#home {
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+}
+
+#home:hover::after {
+    content: "Home";
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.336);
+    color: white;
+    padding: 6px 10px;
+    font-size: 12px;
+    border-radius: 6px;
+    white-space: nowrap;
+    z-index: 9999;
+}   
+
+#add {
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+}
+#add:hover::after {
+    content: "Add income/expense";
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 190, 165, 0.744);
+    color: white;
+    padding: 6px 10px;
+    font-size: 12px;
+    border-radius: 6px;
+    white-space: nowrap;
+    z-index: 9999;
+}  
+
+table{
+    border-collapse: separate;
+    /* border-spacing: 0px 10px ;  */
+    padding: 0 0 25px 0;
+}
+
+.editable{
+    border: solid 1px green;
+}

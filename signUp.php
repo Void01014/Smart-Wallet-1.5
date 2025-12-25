@@ -2,6 +2,9 @@
 include("database.php");
 include("verifyUser.php");
 
+require_once __DIR__ . "/Classes/User.php";
+
+
 
 ?>
 <!DOCTYPE html>
@@ -43,27 +46,26 @@ include("verifyUser.php");
 
     <?php
     if (isset($_POST["signUp"])) {
+        $username = $_POST["username"];
+        $email = $_POST["email"];
+        $password = $_POST["password"];
+        $hash = password_hash($password, PASSWORD_DEFAULT);
 
-        function push(PDO $pdo){
-            $username = $_POST["username"];
-            $email = $_POST["email"];
-            $password = $_POST["password"];
-            $hash = password_hash($password, PASSWORD_DEFAULT);
-            $sql = "INSERT INTO users (username, email, password)
-                        VALUES (:username, :email, :password)";
+        $user = new user($pdo);
+        $user->setName($username);
+        $user->setEmail($email);
+        $user->setpassword($hash);
 
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute([
-                ':username' => $username,
-                ':email' => $email,
-                ':password' => $hash 
-            ]);
-            echo "<script>Swal.fire({icon: 'success', title: 'Good Job', text: 'Your account was created successfully'}).then(() => {
-                  window.location.href = 'index.php';
-                  });</script>";
+        if (!$user->validateAll()) {
+            header("Location: register.php");
+            exit;
         }
-        
-        push($pdo);
+
+        $user->push();
+
+        echo "<script>Swal.fire({icon: 'success', title: 'Good Job', text: 'Your account was created successfully'}).then(() => {
+              window.location.href = 'index.php';
+              });</script>";
     }
     ?>
 </body>

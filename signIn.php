@@ -1,9 +1,8 @@
 <?php
 include("database.php");
 include("verifyUser.php");
-include("verifyOtp.php");
 
-    require_once __DIR__ . "/Classes/Database.php";
+require_once __DIR__ . "/Classes/User.php";
 
 ?>
 <!DOCTYPE html>
@@ -50,36 +49,20 @@ include("verifyOtp.php");
 
     <?php
     if (isset($_POST["signIn"])) {
-            $email = $_POST["email"];
-            $password = $_POST["password"];
-            $sql = "SELECT id, username, email, password
-                    FROM users WHERE email = :email";
+        $email = $_POST["email"];
+        $password = $_POST["password"];
 
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute([':email' => $email]);
-            $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            if ($row) { 
-                $id = $row['id'];
-                $stored_hash = $row['password'];
-                $fetched_email = $row['email'];
-                $username = $row['username'];
-                
-                if (password_verify($password, $stored_hash)) {
-                    echo "<script>
-                            window.location.href = 'index.php';
-                        </script>";
-                } else {
-                    echo "<script>Swal.fire({icon: 'error', title: 'Oops...', text: 'The password or email is wrong'}).then(() => {
-                  window.location.href = 'signIn.php';
-                  });</script>";
-                }
-            }
-            else{
-                echo "<script>Swal.fire({icon: 'error', title: 'Oops...', text: 'The email you entered is not registered'}).then(() => {
-              window.location.href = 'signIn.php';
-              });</script>";
-            }
+        $user = new user($pdo);
+        
+        if ($user->LoadByEmail($email, $password)) {
+            echo "<script>
+                window.location.href = 'index.php';
+            </script>";
+        } else {
+            echo "<script>Swal.fire({icon: 'error', title: 'Oops...', text: 'The password or email is wrong'}).then(() => {
+          window.location.href = 'signIn.php';
+          });</script>";
+        }
     }
     ?>
 </body>

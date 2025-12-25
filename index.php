@@ -1,6 +1,6 @@
 <?php
-include("database.php");
-$test = "hello";
+    include("database.php");
+    include("verifyUser.php")
 ?>
 <script>
     const test = "<?php echo $test ?>"

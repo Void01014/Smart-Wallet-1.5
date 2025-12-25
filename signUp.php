@@ -59,7 +59,7 @@ include("verifyUser.php");
                 ':password' => $password 
             ]);
             echo "<script>Swal.fire({icon: 'success', title: 'Good Job', text: 'Your account was created successfully'}).then(() => {
-                  window.location.href = 'create_card.php';
+                  window.location.href = 'index.php';
                   });</script>";
         }
         

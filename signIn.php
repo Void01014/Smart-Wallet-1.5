@@ -65,8 +65,10 @@ require 'vendor/autoload.php';
             $stmt = $pdo->prepare($sql);
             $stmt->execute([':email' => $email]);
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            print_r($row);
 
-            if ($row) {
+            if ($row) { 
+                echo 'nice';
                 $id = $row['id'];
                 $stored_hash = $row['password'];
                 $fetched_email = $row['email'];
@@ -147,6 +149,11 @@ require 'vendor/autoload.php';
                   window.location.href = 'signIn.php';
                   });</script>";
                 }
+            }
+            else{
+                echo "<script>Swal.fire({icon: 'error', title: 'Oops...', text: 'The email you entered is not registered'}).then(() => {
+              window.location.href = 'signIn.php';
+              });</script>";
             }
     }
     ?>

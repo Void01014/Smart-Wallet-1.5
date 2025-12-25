@@ -57,19 +57,16 @@ require 'vendor/autoload.php';
 
     <?php
     if (isset($_POST["signIn"])) {
-
-        function push($conn)
-        {
             $email = $_POST["email"];
             $password = $_POST["password"];
             $sql = "SELECT id, username, email, password
-                    FROM users WHERE email = ?";
+                    FROM users WHERE email = :email";
 
-            $stmt = mysqli_prepare($conn, $sql);
-            mysqli_stmt_bind_param($stmt, "s", $email);
-            mysqli_stmt_execute($stmt);
-            $result = mysqli_stmt_get_result($stmt);
-            if ($row = mysqli_fetch_assoc($result)) {
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([':email' => $email]);
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($row) {
                 $id = $row['id'];
                 $stored_hash = $row['password'];
                 $fetched_email = $row['email'];
@@ -151,12 +148,7 @@ require 'vendor/autoload.php';
                   });</script>";
                 }
             }
-            mysqli_stmt_close($stmt);
-        }
-
-        push($conn);
     }
-    mysqli_close($conn);
     ?>
 </body>
 

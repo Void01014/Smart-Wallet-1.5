@@ -44,26 +44,27 @@ include("verifyUser.php");
     <?php
     if (isset($_POST["signUp"])) {
 
-        function push($conn){
+        function push(PDO $pdo){
             $username = $_POST["username"];
             $email = $_POST["email"];
             $password = $_POST["password"];
             $hash = password_hash($password, PASSWORD_DEFAULT);
             $sql = "INSERT INTO users (username, email, password)
-                        VALUES (?, ?, ?)";
+                        VALUES (:username, :email, :password)";
 
-            $stmt = mysqli_prepare($conn, $sql);
-            mysqli_stmt_bind_param($stmt, "sss", $username, $email, $hash);
-            mysqli_stmt_execute($stmt);
-            mysqli_stmt_close($stmt);
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([
+                ':username' => $username,
+                ':email' => $email,
+                ':password' => $password 
+            ]);
             echo "<script>Swal.fire({icon: 'success', title: 'Good Job', text: 'Your account was created successfully'}).then(() => {
                   window.location.href = 'create_card.php';
                   });</script>";
         }
         
-        push($conn);
+        push($pdo);
     }
-    mysqli_close($conn);
     ?>
 </body>
 

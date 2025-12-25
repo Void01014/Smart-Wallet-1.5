@@ -56,7 +56,7 @@ include("verifyUser.php");
             $stmt->execute([
                 ':username' => $username,
                 ':email' => $email,
-                ':password' => $password 
+                ':password' => $hash 
             ]);
             echo "<script>Swal.fire({icon: 'success', title: 'Good Job', text: 'Your account was created successfully'}).then(() => {
                   window.location.href = 'index.php';

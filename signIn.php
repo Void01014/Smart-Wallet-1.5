@@ -1,16 +1,9 @@
 <?php
 include("database.php");
 include("verifyUser.php");
+include("verifyOtp.php");
 
-
-
-// Import PHPMailer classes into the global namespace
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
-use PHPMailer\PHPMailer\SMTP;
-
-// Load Composer's autoloader
-require 'vendor/autoload.php';
+    require_once __DIR__ . "/Classes/Database.php";
 
 ?>
 <!DOCTYPE html>
@@ -65,85 +58,17 @@ require 'vendor/autoload.php';
             $stmt = $pdo->prepare($sql);
             $stmt->execute([':email' => $email]);
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
-            print_r($row);
 
             if ($row) { 
-                echo 'nice';
                 $id = $row['id'];
                 $stored_hash = $row['password'];
                 $fetched_email = $row['email'];
                 $username = $row['username'];
-
+                
                 if (password_verify($password, $stored_hash)) {
-                    $otp = random_int(100000, 999999);
-                    $_SESSION['otp'] = $otp;
-                    $_SESSION['otp_id'] = $id;
-                    $mail = new PHPMailer(true);
-
-                    try {
-                        $mail->isSMTP();
-                        $mail->Host       = 'smtp.gmail.com';
-                        $mail->SMTPAuth   = true;
-                        $mail->Password = getenv('MAIL_PASSWORD');
-                        $mail->Username = getenv('MAIL_EMAIL');
-                        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-                        $mail->Port       = 587;
-
-                        $mail->setFrom('omarelfiie2007@gmail.com', 'Live Coding Masters');
-                        $mail->addAddress($fetched_email, '');
-
-                        $mail->isHTML(true);
-                        $mail->Subject = 'Live Coding Test';
-
-                        $mail->Body = '
-                                        <table width="100%" cellpadding="0" cellspacing="0">
-                                            <tr>
-                                                <td align="center">
-                                                <table width="400" style="border:1px solid #ddd; padding:20px;">
-                                                    <tr>
-                                                    <td>
-                                                        <p style="font-size:16px;">Hello 👋</p>
-
-                                                        <p>Your OTP code is:</p>
-
-                                                        <p style="font-size:24px; font-weight:bold;">
-                                                        ' . $otp . '
-                                                        </p>
-                                                    </td>
-                                                    </tr>
-                                                </table>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                        ';
-                        $mail->AltBody = 'This is the plain text body for non-HTML mail clients.';
-                        $mail->send();
-                        echo "<script>
-                                const overlay = document.getElementById('overlay');
-                                overlay.classList.remove('hidden');
-                                function verify() {
-                                    const otp = document.getElementById('otp').value;
-                                    const otp_id = $id;
-                                    fetch('verifyOtp.php', {
-                                        method: 'POST',
-                                        headers: {'Content-Type': 'application/json'},
-                                        credentials: 'same-origin', 
-                                        body: JSON.stringify({ otp , otp_id})
-                                    })
-                                    .then(res => res.json())
-                                    .then(data => {
-                                        if(data.success){
-                                            window.location.href = 'index.php';
-                                        }
-                                        else {
-                                            Swal.fire({ icon: 'error', text: 'Wrong OTP' });
-                                        }
-                                    });
-                                }   
-                              </script>";
-                    } catch (Exception $e) {
-                        echo "❌ Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
-                    }
+                    echo "<script>
+                            window.location.href = 'index.php';
+                        </script>";
                 } else {
                     echo "<script>Swal.fire({icon: 'error', title: 'Oops...', text: 'The password or email is wrong'}).then(() => {
                   window.location.href = 'signIn.php';

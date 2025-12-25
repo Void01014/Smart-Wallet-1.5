@@ -17,10 +17,10 @@ include("database.php");
 <script>
 </script>
 
-<body class="relative flex justify-center font-mono">
-    <nav>
-        <a class="absolute left-[calc(42vw+19vh-14rem)] top-3" href="index.php" id="home"><img class="pointer-events-none" src="img/house_icon.png" width="50" alt="home_button"></a>
-    </nav>
+<body class="md:flex relative justify-center font-mono">
+    <?php
+        include("navbar.php");
+    ?>
     <main class="md:w-[30%] h-[100vh]">
         <form action="manager.php" method="post" class="flex flex-col items-center gap-5 h-full bg-cyan-400 shadow-[0_0_20px_gray] p-15" id="form">
             <input type="hidden" name="mode" value="income">
@@ -57,35 +57,47 @@ include("database.php");
     </main>
 
     <?php
-    if (isset($_POST["add"])) {
-        $mode = $_POST["mode"];
+if (isset($_POST["add"])) {
+    $mode = $_POST["mode"];
 
-        function push($conn, $mode){
-            $type = $_POST["type"];
-            $amount = $_POST["amount"];
-            $date = $_POST["date"];
-            $desc = $_POST["desc"];
-            $sql = "INSERT INTO $mode (type, amount, date, description)
-                        VALUES (?, ?, ?, ?)";
+    function push(PDO $pdo, $mode): void {
+        $type   = $_POST["type"];
+        $amount = $_POST["amount"];
+        $date   = $_POST["date"];
+        $desc   = $_POST["desc"];
 
-            $stmt = mysqli_prepare($conn, $sql);
-            mysqli_stmt_bind_param($stmt, "sdss", $type, $amount, $date, $desc);
-            mysqli_stmt_execute($stmt);
-            mysqli_stmt_close($stmt);
-            echo "<script>Swal.fire({icon: 'success', title: 'Operation successful', text: 'Your {$mode} has been added'}).then(() => {
-                  window.location.href = 'manager.php';
-                  });</script>";
+        if (!in_array($mode, ['income', 'expense'])) {
+            die("Invalid mode");
         }
-        
-        if ($mode == "income") {
-            push($conn, 'income');
-        }
-        if ($mode == "expense") {
-            push($conn, 'expense');
-        }
+
+        $sql = "INSERT INTO {$mode} (type, amount, date, description)
+                VALUES (:type, :amount, :date, :desc)";
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([
+            ':type'   => $type,
+            ':amount' => $amount,
+            ':date'   => $date,
+            ':desc'   => $desc,
+        ]);
+
+        echo "<script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Operation successful',
+                text: 'Your {$mode} has been added'
+            }).then(() => {
+                window.location.href = 'manager.php';
+            });
+        </script>";
     }
-    mysqli_close($conn);
-    ?>
+
+    if ($mode === "income" || $mode === "expense") {
+        push($pdo, $mode);
+    }
+}
+?>
+
 </body>
 
 </html>

@@ -19,11 +19,10 @@ $test = "hello";
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
-<body class="flex justify-center font-mono">
-    <nav>
-        <a class="absolute top-3 left-20" href="manager.php" id="add"><img class="pointer-events-none" src="img/add_icon.png" width="50" alt="home_button"></a>
-    </nav>
-
+<body class="md:flex justify-center font-mono">
+    <?php
+        include("navbar.php");
+    ?>
     <main class="flex justify-center gap-20 flex-wrap p-[5rem_2rem] md:p-20  w-[100vw] h-max bg-cyan-400">
         <?php
         $inc_sql = "SELECT SUM(amount) AS inc_total FROM income";

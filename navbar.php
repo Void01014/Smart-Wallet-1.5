@@ -7,7 +7,7 @@
     </button>
 </div>
 
-<nav id="sidebar" class="fixed bg-gray-900 text-gray-100 w-64 space-y-2 py-7 px-2 inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition duration-200 ease-in-out z-50 flex flex-col h-screen">
+<nav id="sidebar" class="fixed md:sticky md-top-0 bg-gray-900 text-gray-100 w-64 space-y-2 py-7 px-2 inset-y-0 left-0 transform -translate-x-full md:translate-x-0 transition duration-200 ease-in-out z-50 flex flex-col h-screen">
     
     <a href="#" class="text-xl font-bold mb-8 px-4 text-indigo-400">Smart Wallet</a>
 

@@ -1,5 +1,9 @@
 <?php
 include("database.php");
+include("verifyUser.php");
+
+require_once __DIR__ . "/Classes/User.php";
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -19,7 +23,7 @@ include("database.php");
 
 <body class="md:flex relative justify-center font-mono">
     <?php
-        include("navbar.php");
+    include("navbar.php");
     ?>
     <main class="md:w-[30%] h-[100vh]">
         <form action="manager.php" method="post" class="flex flex-col items-center gap-5 h-full bg-cyan-400 shadow-[0_0_20px_gray] p-15" id="form">
@@ -57,14 +61,13 @@ include("database.php");
     </main>
 
     <?php
-if (isset($_POST["add"])) {
-    $mode = $_POST["mode"];
-
-    function push(PDO $pdo, $mode): void {
+    if (isset($_POST["add"])) {
+        $mode = $_POST["mode"];
         $type   = $_POST["type"];
         $amount = $_POST["amount"];
         $date   = $_POST["date"];
         $desc   = $_POST["desc"];
+
 
         if (!in_array($mode, ['income', 'expense'])) {
             die("Invalid mode");
@@ -91,12 +94,7 @@ if (isset($_POST["add"])) {
             });
         </script>";
     }
-
-    if ($mode === "income" || $mode === "expense") {
-        push($pdo, $mode);
-    }
-}
-?>
+    ?>
 
 </body>
 

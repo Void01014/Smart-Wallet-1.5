@@ -19,7 +19,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
-<body class="md:flex justify-center font-mono">
+<body class="md:flex font-mono md:h-[164%]">
     <?php
         include("navbar.php");
     ?>
@@ -27,13 +27,13 @@
         <?php
         $inc_sql = "SELECT SUM(amount) AS inc_total FROM income";
         $exp_sql = "SELECT SUM(amount) AS exp_total FROM expense";
-        $inc_result = mysqli_query($conn, $inc_sql);
-        $exp_result = mysqli_query($conn, $exp_sql);
+        $inc_stmt = $pdo->query($inc_sql);
+        $exp_stmt = $pdo->query($exp_sql);
 
-        $inc_row = mysqli_fetch_assoc($inc_result);
+        $inc_row = $inc_stmt->fetch(PDO::FETCH_ASSOC);
         $inc_total = $inc_row['inc_total'];
-
-        $exp_row = mysqli_fetch_assoc($exp_result);
+        
+        $exp_row = $exp_stmt->fetch(PDO::FETCH_ASSOC);
         $exp_total = $exp_row['exp_total'];
 
         $balance = $inc_total - $exp_total;
@@ -59,26 +59,30 @@
         $current_year = date("Y");
         $current_month = date("m");
 
-        function select($conn, $mode, $current_year, $current_month)
+        function select($pdo, $mode, $current_year, $current_month)
         {
             $sql2 = "SELECT '$mode' AS mode, amount,date
                             FROM $mode
                             WHERE YEAR(date) = $current_year AND MONTH(date) = $current_month
                             ";
 
-            return mysqli_query($conn, $sql2);
+
+            return $pdo->query($sql2);
+        }
+        
+        
+        $inc_amounts = array_fill(0, 31, 0);
+        $inc_results = select($pdo, "income", $current_year, $current_month);
+        foreach($inc_results->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            $day = (int)date('j', strtotime($row['date'])) -1;
+            $inc_amounts[$day] = (float)$row['amount'];
         }
 
-        $inc_amounts = [];
-        $inc_results = select($conn, "income", $current_year, $current_month);
-        while ($row = mysqli_fetch_assoc($inc_results)) {
-            $inc_amounts[] = $row['amount'];
-        }
-
-        $exp_amounts = [];
-        $exp_results = select($conn, "expense", $current_year, $current_month);
-        while ($row = mysqli_fetch_assoc($exp_results)) {
-            $exp_amounts[] = $row['amount'];
+        $exp_amounts = array_fill(0, 31, 0);
+        $exp_results = select($pdo, "expense", $current_year, $current_month);
+        foreach($exp_results->fetchAll(PDO::FETCH_ASSOC) as $row){
+            $day = (int)date('j', strtotime($row['date'])) - 1; 
+            $exp_amounts[$day] = (float)$row['amount'];
         }
         ?>
         <script>
@@ -91,24 +95,24 @@
         </section>
         <table class="w-[100%] h-70 rounded-2xl shadow-[0_0_10px_gray] bg-blue-400  text-center rounded-3xl overflow-hidden text-white" id="table">
             <tr class="h-15 bg-blue-400 text-center">
-                <th>type</th>
+                <th>category</th>
                 <th>amount</th>
                 <th>description</th>
                 <th>date</th>
             </tr>
             <?php
-            $sql3 = "SELECT 'income' AS mode, id,type, amount, date, description
+            $sql3 = "SELECT 'income' AS mode, id, category, amount, date, description
                         FROM income
                         UNION ALL
-                        SELECT 'expense' AS mode, id,type, amount, date, description
+                        SELECT 'expense' AS mode, id, category, amount, date, description
                         FROM expense
                         ORDER BY id;";
 
-            $results = mysqli_query($conn, $sql3);
-            while ($row = mysqli_fetch_assoc($results)) {
+            $results = $pdo->query($sql3);
+            while ($row = $results->fetch(PDO::FETCH_ASSOC  )) {
                 $color = $row["mode"] == 'income' ? '[#00fa00]' : "[#fa0000d9]";
                 echo '<tr class="bg-blue-100 text-[10px] md:text-[20px] rows " id=' . $row["id"] . ' data-mode=' . $row["mode"] . '>
-                            <td  class=" . text-' . $color . ' type">' . $row["type"] .'</td>
+                            <td  class=" . text-' . $color . ' category">' . $row["category"] .'</td>
                             <td  class=" . text-' . $color . ' amount">' . $row["amount"] . ' Dh' .'</td>
                             <td  class=" . text-' . $color . ' desc">' . $row["description"] .'</td>
                             <td  class=" . text-' . $color . ' date">' . $row["date"] .'</td>
@@ -119,10 +123,6 @@
 
 
     </main>
-    <?php
-
-    mysqli_close($conn);
-    ?>
 </body>
 
 </html>

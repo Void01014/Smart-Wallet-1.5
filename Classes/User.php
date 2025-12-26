@@ -7,12 +7,9 @@ class user
     private $email;
     private $password;
 
-    public function __construct($pdo, $name, $email, $password)
+    public function __construct($pdo)
     {
         $this->pdo = $pdo;
-        $this->name = $name;
-        $this->email = $email;
-        $this->password = $password;
     }
 
     ////////////////////////////////////////////
@@ -43,12 +40,15 @@ class user
 
     public function setName($name)
     {
+        $this->name = $name;
     }
     public function setEmail($email)
     {
+        $this->email = $email;
     }
     public function setPassword($password)
     {
+        $this->password = $password;
     }
 
     ////////////////////////////////////////////
@@ -81,8 +81,9 @@ class user
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':email' => $email]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
+        
         if ($row) {
+            
             $id = $row['id'];
             $stored_hash = $row['password'];
             $username = $row['username'];

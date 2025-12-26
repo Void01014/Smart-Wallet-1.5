@@ -1,11 +1,5 @@
 <?php
 include("database.php");
-include("verifyUser.php");
-
-require_once __DIR__ . "/Classes/User.php";
-
-
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -15,7 +9,7 @@ require_once __DIR__ . "/Classes/User.php";
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <script src="js/signUp.js" defer></script>
+    <script src="js/script.js" defer></script>
     <title>Smart Wallet</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -23,48 +17,87 @@ require_once __DIR__ . "/Classes/User.php";
 <script>
 </script>
 
-<body class="relative flex justify-center font-mono">
+<body class="md:flex relative justify-center font-mono">
+    <?php
+        include("navbar.php");
+    ?>
     <main class="md:w-[30%] h-[100vh]">
-        <form action="signUp.php" method="post" class="flex flex-col items-center gap-5 h-full bg-cyan-400 shadow-[0_0_20px_gray] p-15" id="form">
-            <h1 class="text-4xl text-center text-white mt-20">Sign Up</h1>
+        <form action="manager.php" method="post" class="flex flex-col items-center gap-5 h-full bg-cyan-400 shadow-[0_0_20px_gray] p-15" id="form">
+            <input type="hidden" name="mode" value="income">
+            <div class="self-end flex" id="switch">
+                <button type="button" class="bg-gray-300 w-20 selected rounded-l-lg p-2 cursor-pointer" id="inc">Income</button>
+                <button type="button" class="bg-gray-300 w-20 rounded-r-lg p-2 cursor-pointer" id="exp">Expenses</button>
+            </div>
+            <h1 class="text-4xl text-center text-white">Smart Wallet</h1>
             <div class="w-full">
-                <label for="username">Username</label>
-                <input class="bg-white rounded-lg p-2 w-full" placeholder="username" type="text" name="username" id="username">
+                <label for="type">Type</label>
+                <select name="type" id="type" class="bg-white w-full rounded-lg p-2">
+                    <option value="default" disabled selected>choose a type</option>
+                    <option value="salary">Salary</option>
+                    <option value="freelance">Freelance</option>
+                    <option value="gifts">Gifts</option>
+                    <option value="investments">Investments</option>
+                    <option value="other">Other</option>
+                </select>
             </div>
             <div class="w-full">
-                <label for="email">Email</label>
-                <input class="bg-white rounded-lg p-2 w-full" placeholder="email" type="text" name="email" id="email">
+                <label for="amount">Amount</label>
+                <input class="bg-white rounded-lg p-2 w-full" placeholder="Amount" type="number" step="0.1" name="amount" id="amount">
             </div>
             <div class="w-full">
-                <label for="password">password</label>
-                <input class="bg-white rounded-lg p-2 w-full" placeholder="password" type="password" name="password" id="password">
+                <label for="date">Date</label>
+                <input class="bg-white rounded-lg p-2 w-full" placeholder="text" type="date" name="date" id="date">
             </div>
-            <button class="w-50 bg-white p-2 rounded-lg mt-10 hover:shadow-[0_0_10px_gray] hover:bg-blue-500 hover:scale-110 hover:text-white transition duration-200 cursor-pointer" type="submit" name="signUp">Sign Up</button>
-            <a class="underline" href="signIn.php">Sign in</a>
+            <div class="w-full">
+                <label for="desc">Description</label>
+                <input class="bg-white rounded-lg p-2 w-full" placeholder="Write a short description" type="text" name="desc" id="desc">
+            </div>
+            <button class="w-50 bg-white p-2 rounded-lg mt-10 hover:shadow-[0_0_10px_gray] hover:bg-blue-500 hover:scale-110 hover:text-white transition duration-200 cursor-pointer" type="submit" name="add">Add</button>
         </form>
     </main>
 
     <?php
-    if (isset($_POST["signUp"])) {
-        $username = $_POST["username"];
-        $email = $_POST["email"];
-        $password = $_POST["password"];
-        $hash = password_hash($password, PASSWORD_DEFAULT);
+if (isset($_POST["add"])) {
+    $mode = $_POST["mode"];
 
-        $user = new user($pdo, $username, $email, $hash);
+    function push(PDO $pdo, $mode): void {
+        $type   = $_POST["type"];
+        $amount = $_POST["amount"];
+        $date   = $_POST["date"];
+        $desc   = $_POST["desc"];
 
-        if (!$user->validateAll()) {
-            header("Location: register.php");
-            exit;
+        if (!in_array($mode, ['income', 'expense'])) {
+            die("Invalid mode");
         }
 
-        $user->push();
+        $sql = "INSERT INTO {$mode} (type, amount, date, description)
+                VALUES (:type, :amount, :date, :desc)";
 
-        echo "<script>Swal.fire({icon: 'success', title: 'Good Job', text: 'Your account was created successfully'}).then(() => {
-              window.location.href = 'index.php';
-              });</script>";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([
+            ':type'   => $type,
+            ':amount' => $amount,
+            ':date'   => $date,
+            ':desc'   => $desc,
+        ]);
+
+        echo "<script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Operation successful',
+                text: 'Your {$mode} has been added'
+            }).then(() => {
+                window.location.href = 'manager.php';
+            });
+        </script>";
     }
-    ?>
+
+    if ($mode === "income" || $mode === "expense") {
+        push($pdo, $mode);
+    }
+}
+?>
+
 </body>
 
 </html>

@@ -51,8 +51,11 @@ require_once __DIR__ . "/Classes/User.php";
         $password = $_POST["password"];
         $hash = password_hash($password, PASSWORD_DEFAULT);
 
-        $user = new user($pdo, $username, $email, $hash);
-
+        $user = new user($pdo);
+        $user->setName($username);
+        $user->setEmail($email);
+        $user->setpassword($hash);
+        
         if (!$user->validateAll()) {
             header("Location: register.php");
             exit;

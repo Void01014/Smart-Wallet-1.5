@@ -1,5 +1,9 @@
 <?php
-include("database.php");
+    include("database.php");
+
+    require_once __DIR__ . ("/Classes/Transaction.php");
+    require_once __DIR__ . ("/Classes/Expense.php");
+    require_once __DIR__ . ("/Classes/Income.php");
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -19,7 +23,7 @@ include("database.php");
 
 <body class="md:flex relative justify-center font-mono">
     <?php
-        include("navbar.php");
+    include("navbar.php");
     ?>
     <main class="md:w-[30%] h-[100vh]">
         <form action="manager.php" method="post" class="flex flex-col items-center gap-5 h-full bg-cyan-400 shadow-[0_0_20px_gray] p-15" id="form">
@@ -30,9 +34,9 @@ include("database.php");
             </div>
             <h1 class="text-4xl text-center text-white">Smart Wallet</h1>
             <div class="w-full">
-                <label for="type">Type</label>
-                <select name="type" id="type" class="bg-white w-full rounded-lg p-2">
-                    <option value="default" disabled selected>choose a type</option>
+                <label for="categody">Category</label>
+                <select name="category" id="category" class="bg-white w-full rounded-lg p-2">
+                    <option value="default" disabled selected>choose a Category</option>
                     <option value="salary">Salary</option>
                     <option value="freelance">Freelance</option>
                     <option value="gifts">Gifts</option>
@@ -57,29 +61,24 @@ include("database.php");
     </main>
 
     <?php
-if (isset($_POST["add"])) {
-    $mode = $_POST["mode"];
-
-    function push(PDO $pdo, $mode): void {
-        $type   = $_POST["type"];
+    if (isset($_POST["add"])) {
+        $mode = $_POST["mode"];
+        $category   = $_POST["category"];
         $amount = $_POST["amount"];
         $date   = $_POST["date"];
         $desc   = $_POST["desc"];
 
-        if (!in_array($mode, ['income', 'expense'])) {
-            die("Invalid mode");
+        $transaction = new $mode($pdo, $category, $amount, $desc, $date);
+
+        if(!transaction::validateMode($mode)){
+            exit('Invalid mode');
+        };
+
+        if (!$transaction->validateALL()) {
+            exit('Invalid transaction');
         }
 
-        $sql = "INSERT INTO {$mode} (type, amount, date, description)
-                VALUES (:type, :amount, :date, :desc)";
-
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([
-            ':type'   => $type,
-            ':amount' => $amount,
-            ':date'   => $date,
-            ':desc'   => $desc,
-        ]);
+        $transaction->push($pdo, $mode);
 
         echo "<script>
             Swal.fire({
@@ -91,12 +90,7 @@ if (isset($_POST["add"])) {
             });
         </script>";
     }
-
-    if ($mode === "income" || $mode === "expense") {
-        push($pdo, $mode);
-    }
-}
-?>
+    ?>
 
 </body>
 

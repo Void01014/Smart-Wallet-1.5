@@ -19,7 +19,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
-<body class="md:flex font-mono md:h-[164%]">
+<body class="md:flex font-mono md:h-[176.2%]">
     <?php
         include("navbar.php");
     ?>

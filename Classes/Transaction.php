@@ -1,14 +1,27 @@
 <?php 
     abstract class transaction{
-        private $id;
-        private $user_id;
-        private $category;
-        private $description;
-        private $date;
+        protected $pdo;
+        protected $id;
+        protected $user_id;
+        protected $category;
+        protected $amount;
+        protected $description;
+        protected $date;
         
-        public function validate_userDT(){
+        public static function validateMode($mode){
+            return in_array($mode, ['income', 'expense']);
+        }
+        public function validateALL(){
             
         }
+
+        ////////////////////////////////////////////
+        
+        public function push(){
+
+        }
+        
+        ////////////////////////////////////////////
         public function calc_balance(){
             
         }

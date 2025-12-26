@@ -1,15 +1,15 @@
 document.getElementById('switch').addEventListener('click', (event) => {
     const inc = document.getElementById("inc");
     const exp = document.getElementById("exp");
-    const type_slct = document.getElementById("type");
+    const category_slct = document.getElementById("category");
     const mode = document.querySelector("[name=mode]")
 
     inc.classList.toggle("selected");
     exp.classList.toggle("selected");
 
     if (inc.classList.contains('selected')) {
-        type_slct.innerHTML = `
-            <option value="default" disabled selected>choose a type</option>
+        category_slct.innerHTML = `
+            <option value="default" disabled selected>choose a category</option>
             <option value="salary">Salary</option>
             <option value="freelance">Freelance</option>
             <option value="gifts">Gifts</option>
@@ -18,8 +18,8 @@ document.getElementById('switch').addEventListener('click', (event) => {
         `;
         mode.value = "income"
     } else {
-        type_slct.innerHTML = `
-        <option value="default" disabled selected>choose a type</option>
+        category_slct.innerHTML = `
+        <option value="default" disabled selected>choose a category</option>
         <option value="food_groceries">Food & Groceries</option>
         <option value="transport">Transport</option>
         <option value="rent_housing">Rent/Housing</option>
@@ -39,8 +39,8 @@ form.addEventListener('submit', (e) => {
     const string_RGX = /^[A-Za-z0-9 .,&'()\-]+$/;
     const amount_RGX = /^\d+(\.\d{1,2})?$/;
 
-    if (form.querySelector('[name="type"]').value == 'default') {
-        Swal.fire({icon: "error", title: "Oops...", text: "Please enter a valid type",});
+    if (form.querySelector('[name="category"]').value == 'default') {
+        Swal.fire({icon: "error", title: "Oops...", text: "Please enter a valid category",});
         e.preventDefault()
         return
     }

@@ -1,6 +1,8 @@
 <?php
     include("database.php");
-    include("verifyUser.php")
+    include("verifyUser.php");
+
+    require_once __DIR__ . ("/Classes/TransactionRepositorie.php")
 ?>
 <script>
     const test = "<?php echo $test ?>"
@@ -18,7 +20,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
-<body class="md:flex font-mono md:h-[176.2%]">
+<body class="md:flex font-mono md:h-[166%]">
     <?php
         include("navbar.php");
     ?>
@@ -100,23 +102,20 @@
                 <th>date</th>
             </tr>
             <?php
-            $sql3 = "SELECT 'income' AS mode, id, category, amount, date, description
-                        FROM income
-                        UNION ALL
-                        SELECT 'expense' AS mode, id, category, amount, date, description
-                        FROM expense
-                        ORDER BY id;";
+                $repo = new TransactionRepositorie($pdo);
 
-            $results = $pdo->query($sql3);
-            while ($row = $results->fetch(PDO::FETCH_ASSOC  )) {
+                $allTransactions = $repo->getAllByUser($_SESSION['login_id']);
+
+                foreach($allTransactions as $row) {
                 $color = $row["mode"] == 'income' ? '[#00fa00]' : "[#fa0000d9]";
                 echo '<tr class="bg-blue-100 text-[10px] md:text-[20px] rows " id=' . $row["id"] . ' data-mode=' . $row["mode"] . '>
-                            <td  class=" . text-' . $color . ' category">' . $row["category"] .'</td>
-                            <td  class=" . text-' . $color . ' amount">' . $row["amount"] . ' Dh' .'</td>
-                            <td  class=" . text-' . $color . ' desc">' . $row["description"] .'</td>
-                            <td  class=" . text-' . $color . ' date">' . $row["date"] .'</td>
+                            <td  class="text-' . $color . ' category">' . $row["category"] .'</td>
+                            <td  class="text-' . $color . ' amount">' . $row["amount"] . ' Dh' .'</td>
+                            <td  class="text-' . $color . ' desc">' . $row["description"] .'</td>
+                            <td  class="text-' . $color . ' date">' . $row["date"] .'</td>
                         </tr>';
             }
+
             ?>
         </table>
 

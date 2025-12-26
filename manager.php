@@ -1,9 +1,9 @@
 <?php
-    include("database.php");
+include("database.php");
 
-    require_once __DIR__ . ("/Classes/Transaction.php");
-    require_once __DIR__ . ("/Classes/Expense.php");
-    require_once __DIR__ . ("/Classes/Income.php");
+require_once __DIR__ . ("/Classes/Transaction.php");
+require_once __DIR__ . ("/Classes/Expense.php");
+require_once __DIR__ . ("/Classes/Income.php");
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -11,7 +11,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="js/script.js" defer></script>
     <title>Smart Wallet</title>
@@ -50,9 +49,12 @@
         }
 
         @keyframes float {
-            0%, 100% {
+
+            0%,
+            100% {
                 transform: translateY(0) rotate(0deg);
             }
+
             50% {
                 transform: translateY(-30px) rotate(180deg);
             }
@@ -62,6 +64,7 @@
             0% {
                 transform: rotate(0deg) translateX(10px);
             }
+
             100% {
                 transform: rotate(360deg) translateX(10px);
             }
@@ -77,10 +80,13 @@
         }
 
         @keyframes pulse {
-            0%, 100% {
+
+            0%,
+            100% {
                 transform: scale(1);
                 opacity: 0.3;
             }
+
             50% {
                 transform: scale(1.2);
                 opacity: 0.5;
@@ -88,8 +94,9 @@
         }
     </style>
 </head>
+
 <body class="md:flex relative justify-center font-mono">
-    
+
     <?php
     include("navbar.php");
     ?>
@@ -162,7 +169,7 @@
 
         $transaction = new $mode($pdo, $category, $amount, $desc, $date);
 
-        if(!transaction::validateMode($mode)){
+        if (!transaction::validateMode($mode)) {
             exit('Invalid mode');
         };
 

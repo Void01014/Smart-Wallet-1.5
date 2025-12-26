@@ -17,16 +17,108 @@
     <title>Smart Wallet</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-</head>
-<script>
-</script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 50%, #22d3ee 100%);
+        }
 
+        .background-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: -1;
+        }
+
+        /* Geometric shapes */
+        .shape {
+            position: absolute;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(5px);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            animation: rotate 20s infinite linear;
+        }
+
+        .shape.circle {
+            border-radius: 50%;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-30px) rotate(180deg);
+            }
+        }
+
+        @keyframes rotate {
+            0% {
+                transform: rotate(0deg) translateX(10px);
+            }
+            100% {
+                transform: rotate(360deg) translateX(10px);
+            }
+        }
+
+        /* Gradient orbs */
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.3;
+            animation: pulse 8s infinite ease-in-out;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.3;
+            }
+            50% {
+                transform: scale(1.2);
+                opacity: 0.5;
+            }
+        }
+    </style>
+</head>
 <body class="md:flex relative justify-center font-mono">
+    
     <?php
     include("navbar.php");
     ?>
-    <main class="md:w-[30%] h-[100vh]">
-        <form action="manager.php" method="post" class="flex flex-col items-center gap-5 h-full bg-cyan-400 shadow-[0_0_20px_gray] p-15" id="form">
+    <div class="background-container" id="bg">
+        <!-- Large gradient orbs -->
+        <div class="orb" style="width: 300px; height: 300px; background: #ffffffff; top: 10%; left: 20%;"></div>
+        <div class="orb" style="width: 400px; height: 400px; background: #ffffffff; bottom: 10%; right: 10%;"></div>
+        <div class="orb" style="width: 250px; height: 250px; background: #ffffffff; top: 50%; right: 30%; animation-delay: 2s;"></div>
+    </div>
+
+    <script>
+        const bg = document.getElementById('bg');
+
+        // Create geometric shapes
+        for (let i = 0; i < 10; i++) {
+            const shape = document.createElement('div');
+            shape.className = 'shape' + (Math.random() > 0.5 ? ' circle' : '');
+            const size = Math.random() * 100 + 50;
+            shape.style.width = size + 'px';
+            shape.style.height = size + 'px';
+            shape.style.left = Math.random() * 100 + '%';
+            shape.style.top = Math.random() * 100 + '%';
+            shape.style.animationDuration = (Math.random() * 20 + 15) + 's';
+            shape.style.animationDelay = Math.random() * 5 + 's';
+            bg.appendChild(shape);
+        }
+    </script>
+    <main class="md:w-[30%] h-[100vh] rounded-r-4xl overflow-hidden">
+        <form action="manager.php" method="post" class="flex flex-col items-center gap-5 h-full bg-cyan-400 shadow-[0_0_20px_white] p-15" id="form">
             <input type="hidden" name="mode" value="income">
             <div class="self-end flex" id="switch">
                 <button type="button" class="bg-gray-300 w-20 selected rounded-l-lg p-2 cursor-pointer" id="inc">Income</button>

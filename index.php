@@ -20,11 +20,13 @@ require_once __DIR__ . ("/Classes/TransactionRepositorie.php")
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
-<body class="md:flex font-mono md:h-[166%]">
-    <?php
+<body class="font-mono overflow-x-hidden">
+        <?php
     include("navbar.php");
     ?>
-    <main class="flex justify-center gap-20 flex-wrap p-[5rem_2rem] md:p-20  w-[100vw] h-max bg-cyan-400">
+
+
+    <main class="md:ml-64 flex justify-center gap-20 flex-wrap p-[5rem_2rem] md:p-20 md:w-[85%] bg-cyan-400 min-h-screen">
         <?php
         $repo = new TransactionRepositorie($pdo);
 
@@ -63,7 +65,31 @@ require_once __DIR__ . ("/Classes/TransactionRepositorie.php")
         <section class="w-full h-max md:w-[70%] bg-white rounded-xl shadow-[0_0_15px_gray]" id="grah_section">
             <canvas id="graph"></canvas>
         </section>
-        <table class="w-[100%] h-70 rounded-2xl shadow-[0_0_10px_gray] bg-blue-400  text-center rounded-3xl overflow-hidden text-white" id="table">
+
+        <form action="filter.php" method="post">
+            <div class="w-full flex items-end gap-5">
+                <div>
+                    <label for="categody">Category</label>
+                    <select name="category" id="category" class="bg-white w-full rounded-lg p-2">
+                        <option value="all" disabled selected>choose a Category</option>
+                        <option value="salary">Salary</option>
+                        <option value="freelance">Freelance</option>
+                        <option value="gifts">Gifts</option>
+                        <option value="investments">Investments</option>
+                        <option value="food_groceries">Food & Groceries</option>
+                        <option value="transport">Transport</option>
+                        <option value="rent_housing">Rent/Housing</option>
+                        <option value="investments_expenses">Investment Expense</option>
+                        <option value="health">Health</option>
+                        <option value="entertainment">Entertainment</option>
+                        <option value="shopping">Shopping</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <button class="w-20 bg-white p-1 rounded-lg hover:shadow-[0_0_10px_gray] hover:bg-blue-500 hover:scale-110 hover:text-white transition duration-200 cursor-pointer" type="submit" name="filter">filter</button>
+            </div>
+        </form>
+        <table class="w-[80%] h-70 rounded-2xl shadow-[0_0_10px_gray] bg-blue-400 text-center rounded-3xl overflow-hidden text-white" id="table">
             <tr class="h-15 bg-blue-400 text-center">
                 <th>category</th>
                 <th>amount</th>
@@ -80,7 +106,6 @@ require_once __DIR__ . ("/Classes/TransactionRepositorie.php")
                                 <td  class="text-' . $color . ' date">' . $row["date"] . '</td>
                             </tr>';
             }
-
             ?>
         </table>
     </main>

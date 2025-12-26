@@ -12,6 +12,7 @@ require_once __DIR__ . ("/Classes/Income.php");
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="styles.css">
     <script src="js/script.js" defer></script>
     <title>Smart Wallet</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -22,6 +23,12 @@ require_once __DIR__ . ("/Classes/Income.php");
             padding: 0;
             overflow: hidden;
             background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 50%, #22d3ee 100%);
+        }
+        form{
+            background-color: #ffffff50;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(3px);
+            border-radius: 30px;
         }
 
         .background-container {
@@ -124,8 +131,8 @@ require_once __DIR__ . ("/Classes/Income.php");
             bg.appendChild(shape);
         }
     </script>
-    <main class="md:w-[30%] h-[100vh] rounded-r-4xl overflow-hidden">
-        <form action="manager.php" method="post" class="flex flex-col items-center gap-5 h-full bg-cyan-400 shadow-[0_0_20px_white] p-15" id="form">
+    <main class="md:w-[30%] h-[100vh] rounded-[30px] overflow-hidden">
+        <form action="manager.php" method="post" class="flex flex-col items-center gap-5 h-full shadow-[0_0_20px_white] p-15" id="form">
             <input type="hidden" name="mode" value="income">
             <div class="self-end flex" id="switch">
                 <button type="button" class="bg-gray-300 w-20 selected rounded-l-lg p-2 cursor-pointer" id="inc">Income</button>

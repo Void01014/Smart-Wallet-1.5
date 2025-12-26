@@ -2,7 +2,44 @@
 include("database.php");
 include("verifyUser.php");
 
-require_once __DIR__ . ("/Classes/TransactionRepositorie.php")
+require_once __DIR__ . ("/Classes/TransactionRepositorie.php");
+
+$user_id = $_SESSION['login_id'];
+
+$selectedCategory = $_POST['category'] ?? 'all';
+
+echo $selectedCategory;
+
+
+if ($selectedCategory === 'all') {
+    $sql = "SELECT 'income' AS mode, id, category, amount, date, description
+            FROM income
+            WHERE user_id = ?
+            UNION ALL
+            SELECT 'expense' AS mode, id, category, amount, date, description
+            FROM expense
+            WHERE user_id = ?
+            ORDER BY id";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$user_id, $user_id]); // bind user_id twice for both SELECTs
+
+} else {
+    $sql = "SELECT 'income' AS mode, id, category, amount, date, description
+            FROM income
+            WHERE user_id = ? AND category = ?
+            UNION ALL
+            SELECT 'expense' AS mode, id, category, amount, date, description
+            FROM expense
+            WHERE user_id = ? AND category = ?
+            ORDER BY id";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$user_id, $selectedCategory, $user_id, $selectedCategory]);
+}
+
+$allTransactions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 ?>
 <script>
     const test = "<?php echo $test ?>"
@@ -29,8 +66,6 @@ require_once __DIR__ . ("/Classes/TransactionRepositorie.php")
     <main class="md:ml-64 flex justify-center gap-20 flex-wrap p-[5rem_2rem] md:p-20 md:w-[85%] bg-cyan-400 min-h-screen">
         <?php
         $repo = new TransactionRepositorie($pdo);
-
-        $allTransactions = $repo->getAllByUser($_SESSION['login_id']);
         
         $totalIncome = $repo->getTotals($allTransactions)['income'];
         $totalExpense = $repo->getTotals($allTransactions)['expense'];
@@ -66,7 +101,7 @@ require_once __DIR__ . ("/Classes/TransactionRepositorie.php")
             <canvas id="graph"></canvas>
         </section>
 
-        <form action="filter.php" method="post">
+        <form action="index.php" method="post">
             <div class="w-full flex items-end gap-5">
                 <div>
                     <label for="categody">Category</label>
@@ -81,9 +116,9 @@ require_once __DIR__ . ("/Classes/TransactionRepositorie.php")
                         <option value="rent_housing">Rent/Housing</option>
                         <option value="investments_expenses">Investment Expense</option>
                         <option value="health">Health</option>
-                        <option value="entertainment">Entertainment</option>
-                        <option value="shopping">Shopping</option>
-                        <option value="other">Other</option>
+                        <option  value="entertainment">Entertainment</option>
+                        <option  value="shopping">Shopping</option>
+                        <option  value="other">Other</option>
                     </select>
                 </div>
                 <button class="w-20 bg-white p-1 rounded-lg hover:shadow-[0_0_10px_gray] hover:bg-blue-500 hover:scale-110 hover:text-white transition duration-200 cursor-pointer" type="submit" name="filter">filter</button>

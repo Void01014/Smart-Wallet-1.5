@@ -7,9 +7,12 @@ class user
     private $email;
     private $password;
 
-    public function __construct($pdo)
+    public function __construct($pdo, $name, $email, $password)
     {
         $this->pdo = $pdo;
+        $this->name = $name;
+        $this->email = $email;
+        $this->password = $password;
     }
 
     ////////////////////////////////////////////
@@ -40,15 +43,12 @@ class user
 
     public function setName($name)
     {
-        $this->name = $name;
     }
     public function setEmail($email)
     {
-        $this->email = $email;
     }
     public function setPassword($password)
     {
-        $this->password = $password;
     }
 
     ////////////////////////////////////////////

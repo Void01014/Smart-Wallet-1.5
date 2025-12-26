@@ -1,8 +1,8 @@
 <?php
-    include("database.php");
-    include("verifyUser.php");
+include("database.php");
+include("verifyUser.php");
 
-    require_once __DIR__ . ("/Classes/TransactionRepositorie.php")
+require_once __DIR__ . ("/Classes/TransactionRepositorie.php")
 ?>
 <script>
     const test = "<?php echo $test ?>"
@@ -22,22 +22,17 @@
 
 <body class="md:flex font-mono md:h-[166%]">
     <?php
-        include("navbar.php");
+    include("navbar.php");
     ?>
     <main class="flex justify-center gap-20 flex-wrap p-[5rem_2rem] md:p-20  w-[100vw] h-max bg-cyan-400">
         <?php
-        $inc_sql = "SELECT SUM(amount) AS inc_total FROM income";
-        $exp_sql = "SELECT SUM(amount) AS exp_total FROM expense";
-        $inc_stmt = $pdo->query($inc_sql);
-        $exp_stmt = $pdo->query($exp_sql);
+        $repo = new TransactionRepositorie($pdo);
 
-        $inc_row = $inc_stmt->fetch(PDO::FETCH_ASSOC);
-        $inc_total = $inc_row['inc_total'];
+        $allTransactions = $repo->getAllByUser($_SESSION['login_id']);
         
-        $exp_row = $exp_stmt->fetch(PDO::FETCH_ASSOC);
-        $exp_total = $exp_row['exp_total'];
-
-        $balance = $inc_total - $exp_total;
+        $totalIncome = $repo->getTotals($allTransactions)['income'];
+        $totalExpense = $repo->getTotals($allTransactions)['expense'];
+        $balance = $repo->getTotals($allTransactions)['balance'];
 
         ?>
         <section class="flex flex-col items-center justify-center gap-7 w-120 h-70 bg-white rounded-2xl shadow-[0_0_10px_gray]" id="balance">
@@ -49,46 +44,20 @@
         <section class="flex justify-center gap-2 p-5 flex-wrap w-80 h-70 bg-white rounded-2xl shadow-[0_0_10px_gray]" id="total_stats">
             <h2 class="text-3xl">Total Income:</h2>
             <?php
-            echo "<h2 class='text-4xl text-green-500'>{$inc_total} Dh</h2>";
+            echo "<h2 class='text-4xl text-green-500'>{$totalIncome} Dh</h2>";
             ?>
             <h2 class="text-3xl">Total Expenses:</h2>
             <?php
-            echo "<h2 class='text-4xl text-red-500'>{$exp_total} Dh</h2>";
+            echo "<h2 class='text-4xl text-red-500'>{$totalExpense} Dh</h2>";
             ?>
         </section>
         <?php
-        $current_year = date("Y");
-        $current_month = date("m");
-
-        function select($pdo, $mode, $current_year, $current_month)
-        {
-            $sql2 = "SELECT '$mode' AS mode, amount,date
-                            FROM $mode
-                            WHERE YEAR(date) = $current_year AND MONTH(date) = $current_month
-                            ";
-
-
-            return $pdo->query($sql2);
-        }
-        
-        
-        $inc_amounts = array_fill(0, 31, 0);
-        $inc_results = select($pdo, "income", $current_year, $current_month);
-        foreach($inc_results->fetchAll(PDO::FETCH_ASSOC) as $row) {
-            $day = (int)date('j', strtotime($row['date'])) -1;
-            $inc_amounts[$day] = (float)$row['amount'];
-        }
-
-        $exp_amounts = array_fill(0, 31, 0);
-        $exp_results = select($pdo, "expense", $current_year, $current_month);
-        foreach($exp_results->fetchAll(PDO::FETCH_ASSOC) as $row){
-            $day = (int)date('j', strtotime($row['date'])) - 1; 
-            $exp_amounts[$day] = (float)$row['amount'];
-        }
+            $monthIncome = $repo->getMonthStats()['income'];
+            $monthExpense = $repo->getMonthStats()['expense'];
         ?>
         <script>
-            let inc_amounts = <?php echo json_encode($inc_amounts); ?>;
-            let exp_amounts = <?php echo json_encode($exp_amounts); ?>;
+            let inc_amounts = <?php echo json_encode($monthIncome); ?>;
+            let exp_amounts = <?php echo json_encode($monthExpense); ?>;
         </script>
 
         <section class="w-full h-max md:w-[70%] bg-white rounded-xl shadow-[0_0_15px_gray]" id="grah_section">
@@ -102,24 +71,18 @@
                 <th>date</th>
             </tr>
             <?php
-                $repo = new TransactionRepositorie($pdo);
-
-                $allTransactions = $repo->getAllByUser($_SESSION['login_id']);
-
-                foreach($allTransactions as $row) {
+            foreach($allTransactions as $row) {
                 $color = $row["mode"] == 'income' ? '[#00fa00]' : "[#fa0000d9]";
                 echo '<tr class="bg-blue-100 text-[10px] md:text-[20px] rows " id=' . $row["id"] . ' data-mode=' . $row["mode"] . '>
-                            <td  class="text-' . $color . ' category">' . $row["category"] .'</td>
-                            <td  class="text-' . $color . ' amount">' . $row["amount"] . ' Dh' .'</td>
-                            <td  class="text-' . $color . ' desc">' . $row["description"] .'</td>
-                            <td  class="text-' . $color . ' date">' . $row["date"] .'</td>
-                        </tr>';
+                                <td  class="text-' . $color . ' category">' . $row["category"] . '</td>
+                                <td  class="text-' . $color . ' amount">' . $row["amount"] . ' Dh' . '</td>
+                                <td  class="text-' . $color . ' desc">' . $row["description"] . '</td>
+                                <td  class="text-' . $color . ' date">' . $row["date"] . '</td>
+                            </tr>';
             }
 
             ?>
         </table>
-
-
     </main>
 </body>
 

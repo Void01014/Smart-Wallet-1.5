@@ -105,8 +105,4 @@ class user
             return false;
         }
     }
-
-    ////////////////////////////////////////////
-
-    public function calc_balance() {}
 }

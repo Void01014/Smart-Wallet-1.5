@@ -22,7 +22,7 @@
         }
         
         ////////////////////////////////////////////
-        public function calc_balance(){
+        public function getAmount(){
             
         }
     }

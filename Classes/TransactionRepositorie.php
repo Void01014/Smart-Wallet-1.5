@@ -12,16 +12,32 @@ class TransactionRepositorie
 
     public function getAllByUser($user_id)
     {
-        $sql3 = "SELECT 'income' AS mode, id, category, amount, date, description
-                        FROM income
-                        UNION ALL
-                        SELECT 'expense' AS mode, id, category, amount, date, description
-                        FROM expense
-                        WHERE user_id = $user_id
-                        ORDER BY id";
+        $sql = "SELECT 'income' AS mode, id, category, amount, date, description
+                 FROM income
+                 WHERE user_id = ?
+                 UNION ALL
+                 SELECT 'expense' AS mode, id, category, amount, date, description
+                 FROM expense
+                 WHERE user_id = ?
+                 ORDER BY id";
 
-        $results = $this->pdo->query($sql3);
-        return $results->fetchAll(PDO::FETCH_ASSOC);
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([$user_id, $user_id]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    public function getByCategory($user_id, $selectedCategory){
+        $sql = "SELECT 'income' AS mode, id, category, amount, date, description
+        FROM income
+        WHERE user_id = ? AND category = ?
+        UNION ALL
+        SELECT 'expense' AS mode, id, category, amount, date, description
+        FROM expense
+        WHERE user_id = ? AND category = ?
+        ORDER BY id";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([$user_id, $selectedCategory, $user_id, $selectedCategory]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function getTotals($allTransactions)

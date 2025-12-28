@@ -4,42 +4,6 @@ include("verifyUser.php");
 
 require_once __DIR__ . ("/Classes/TransactionRepositorie.php");
 
-$user_id = $_SESSION['login_id'];
-
-$selectedCategory = $_POST['category'] ?? 'all';
-
-echo $selectedCategory;
-
-
-if ($selectedCategory === 'all') {
-    $sql = "SELECT 'income' AS mode, id, category, amount, date, description
-            FROM income
-            WHERE user_id = ?
-            UNION ALL
-            SELECT 'expense' AS mode, id, category, amount, date, description
-            FROM expense
-            WHERE user_id = ?
-            ORDER BY id";
-
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute([$user_id, $user_id]); // bind user_id twice for both SELECTs
-
-} else {
-    $sql = "SELECT 'income' AS mode, id, category, amount, date, description
-            FROM income
-            WHERE user_id = ? AND category = ?
-            UNION ALL
-            SELECT 'expense' AS mode, id, category, amount, date, description
-            FROM expense
-            WHERE user_id = ? AND category = ?
-            ORDER BY id";
-
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute([$user_id, $selectedCategory, $user_id, $selectedCategory]);
-}
-
-$allTransactions = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
 ?>
 <script>
     const test = "<?php echo $test ?>"
@@ -65,7 +29,16 @@ $allTransactions = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <main class="md:ml-64 flex justify-center gap-20 flex-wrap p-[5rem_2rem] md:p-20 md:w-[85%] bg-cyan-400 min-h-screen">
         <?php
+        $user_id = $_SESSION['login_id'];
+        $selectedCategory = $_POST['category'] ?? 'all';
+
         $repo = new TransactionRepositorie($pdo);
+
+        if ($selectedCategory === 'all') {
+            $allTransactions = $repo->getAllByUser($user_id);
+        } else {
+            $allTransactions = $repo->getByCategory($user_id, $selectedCategory);
+        }
         
         $totalIncome = $repo->getTotals($allTransactions)['income'];
         $totalExpense = $repo->getTotals($allTransactions)['expense'];
@@ -106,7 +79,7 @@ $allTransactions = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <div>
                     <label for="categody">Category</label>
                     <select name="category" id="category" class="bg-white w-full rounded-lg p-2">
-                        <option value="all" disabled selected>choose a Category</option>
+                        <option value="all" selected>Show all</option>
                         <option value="salary">Salary</option>
                         <option value="freelance">Freelance</option>
                         <option value="gifts">Gifts</option>
